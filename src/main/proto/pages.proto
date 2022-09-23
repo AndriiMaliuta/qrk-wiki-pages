@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.andmal";
+option java_outer_classname = "PagesGrpcProto";
+
+package pages;
+
+service PagesGrpc {
+  rpc GetPage (PagesRequest) returns (PageReply) {}
+  rpc GetPages(PagesRequest) returns (stream PageReply) {}
+}
+
+message PagesRequest {
+  string id = 1;
+}
+
+message PageReply {
+  string title = 1;
+  string body = 2;
+  string space = 3;
+}

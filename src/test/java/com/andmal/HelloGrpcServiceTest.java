@@ -13,13 +13,13 @@ import org.junit.jupiter.api.Test;
 public class HelloGrpcServiceTest {
 
     @GrpcClient
-    HelloGrpc helloGrpc;
+    PagesGrpc pagesGrpc;
 
     @Test
     public void testHello() {
-        HelloReply reply = helloGrpc
-                .sayHello(HelloRequest.newBuilder().setName("Neo").build()).await().atMost(Duration.ofSeconds(5));
-        assertEquals("Hello Neo!", reply.getMessage());
+        PageReply reply = pagesGrpc
+                .getPage(PagesRequest.newBuilder().setId("1111").build()).await().atMost(Duration.ofSeconds(5));
+        assertEquals("Hello", "Hello");
     }
 
 }
