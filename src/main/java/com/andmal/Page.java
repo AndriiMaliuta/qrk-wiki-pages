@@ -4,6 +4,7 @@ import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 import io.smallrye.mutiny.Uni;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -17,13 +18,13 @@ public class Page extends PanacheEntity {
     @Column(name = "space_key")
     public String spaceKey;
     @Column(name = "author_id")
-    public String authorId;
+    public Long authorId;
     @Column(name = "created_at")
-    public String createdAt;
+    public LocalDateTime createdAt;
     @Column(name = "last_updated")
-    public String lastUpdated;
+    public LocalDateTime lastUpdated;
     @Column(name = "parent_id")
-    public String parentId;
+    public Long parentId;
     public static Uni<List<Page>> findBySpaceKey(String spaceKey) {
         return find("#Page.getBySpace", spaceKey).list();
     }

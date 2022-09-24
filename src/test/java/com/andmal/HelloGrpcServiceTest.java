@@ -18,7 +18,7 @@ public class HelloGrpcServiceTest {
     @Test
     public void testHello() {
         PageReply reply = pagesGrpc
-                .getPage(PagesRequest.newBuilder().setId("1111").build()).await().atMost(Duration.ofSeconds(5));
+                .getPage(PagesRequest.newBuilder().setId(1111L).build()).await().atMost(Duration.ofSeconds(5));
         assertEquals("Hello", "Hello");
     }
 
