@@ -1,13 +1,16 @@
 package com.andmal;
 
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
+import io.smallrye.mutiny.Uni;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "pages")
+@NamedQueries({
+        @NamedQuery(name = "Page.getBySpace", query = "from Page where space_key = ?1")
+})
 public class Page extends PanacheEntity {
     public String title;
     public String body;
@@ -21,4 +24,7 @@ public class Page extends PanacheEntity {
     public String lastUpdated;
     @Column(name = "parent_id")
     public String parentId;
+    public static Uni<List<Page>> findBySpaceKey(String spaceKey) {
+        return find("#Page.getBySpace", spaceKey).list();
+    }
 }
