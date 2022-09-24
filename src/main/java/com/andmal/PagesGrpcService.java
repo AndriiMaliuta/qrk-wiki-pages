@@ -2,6 +2,7 @@ package com.andmal;
 
 import io.quarkus.grpc.GrpcService;
 
+import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
@@ -20,9 +21,12 @@ public class PagesGrpcService implements PagesGrpc {
 
     @Override
     public Uni<PageReply> getPage(PagesRequest request) {
-        return Uni.createFrom().item(request.getId())
+        Long id = Long.parseLong(request.getId());
+        Uni<PanacheEntityBase> page = Page.findById(id);
+        Page.find("id", id);
+        return Uni.createFrom().item(page)
                 .map(p -> PageReply.newBuilder()
-                        .setSpace("space")
+                        .setSpace("SPACE 1")
                         .setBody("aaa")
                         .setTitle("Page 1")
                         .build());
@@ -30,11 +34,28 @@ public class PagesGrpcService implements PagesGrpc {
 
     @Override
     public Multi<PageReply> getPages(PagesRequest request) {
-        return Multi.createFrom().item(request.getId())
-                .map(p -> PageReply.newBuilder()
-                        .setSpace("space")
-                        .setBody("aaa")
-                        .setTitle("Page 1")
-                        .build());
+        PageReply pageReply = PageReply.newBuilder().setBody("lorem").setSpace("A").setTitle("A").build();
+        return Multi.createFrom().emitter(i -> {
+            i.emit(pageReply);
+            i.emit(pageReply);
+            i.emit(pageReply);
+            i.emit(pageReply);
+            i.emit(pageReply);
+            i.emit(pageReply);
+            i.emit(pageReply);
+            i.emit(pageReply);
+            i.emit(pageReply);
+            i.emit(pageReply);
+            i.emit(pageReply);
+            i.emit(pageReply);
+            i.emit(pageReply);
+            i.complete();
+        });
+//        return Multi.createFrom().item(request.getId())
+//                .map(p -> PageReply.newBuilder()
+//                        .setSpace("space")
+//                        .setBody("aaa")
+//                        .setTitle("Page 1")
+//                        .build());
     }
 }
