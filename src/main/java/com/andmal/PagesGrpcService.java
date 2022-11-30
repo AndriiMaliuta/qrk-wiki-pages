@@ -51,10 +51,15 @@ public class PagesGrpcService implements PagesGrpc {
 //                        .setTitle()
 //                        .buildPartial());
     return pageRepo.getAll()
-            .map(page -> PageReply.newBuilder()
-                    .setTitle(page.title)
-                    .setBody(page.body)
-                    .setSpace(page.spaceKey)
+            .map(p -> PageReply.newBuilder()
+                    .setId(p.id)
+                    .setTitle(p.title)
+                    .setBody(p.body)
+                    .setSpace(p.spaceKey)
+                    .setAuthorId(p.authorId)
+                    .setParentId(p.parentId)
+                    .setCreatedAt(p.createdAt.toString())
+                    .setLastUpdated(p.lastUpdated.toString())
                     .buildPartial());
     }
 }
