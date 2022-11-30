@@ -13,7 +13,6 @@ import java.util.List;
 
 @Path("/rest/api/pages")
 public class PageResource {
-
     @Inject
     PageRepo pageRepo;
 
