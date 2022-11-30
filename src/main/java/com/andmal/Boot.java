@@ -13,7 +13,6 @@ public class Boot {
 
     void onStart(@Observes StartupEvent event) {
         LOG.info(">>> pages count is:");
-
 //        Page.count().subscribe().with(c -> LOG.info(c.toString()));
         LOG.info(Page.count().await().indefinitely().toString());
         System.out.println(Page.findById(147L).await().indefinitely());
