@@ -13,20 +13,26 @@ import javax.inject.Inject;
 @GrpcService
 public class PagesGrpcService implements PagesGrpc {
     private static final Logger LOG = LoggerFactory.getLogger(PagesGrpcService.class);
-
     @Inject
     PageRepo pageRepo;
     @Override
     public Uni<PageReply> getPage(PagesRequest request) {
+        LOG.info(">> performing gRPC GET_PAGE request");
         Long id = request.getId();
+        LOG.info(">> ID is " + id);
 //        Page page = Page.<Page>findById(id).await().indefinitely();
         Uni<Page> pageUni = Page.<Page>findById(id);
 
         return pageUni.map(p -> PageReply.newBuilder()
+                .setId(p.id)
                 .setTitle(p.title)
                 .setBody(p.body)
                 .setSpace(p.spaceKey)
-                .buildPartial());
+                .setAuthorId(p.authorId)
+                .setParentId(p.parentId)
+                .setCreatedAt(p.createdAt.toString())
+                .setLastUpdated(p.lastUpdated.toString())
+                .build());
     }
 
     @Override
