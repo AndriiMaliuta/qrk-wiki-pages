@@ -4,19 +4,31 @@ import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactiona
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import io.vertx.mutiny.pgclient.PgPool;
+import io.vertx.mutiny.sqlclient.Row;
+import io.vertx.mutiny.sqlclient.RowSet;
+import io.vertx.mutiny.sqlclient.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
-import javax.persistence.PersistenceException;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.StreamSupport;
 
 @ApplicationScoped
 public class Boot {
     private static final Logger LOG = LoggerFactory.getLogger(Boot.class);
-    @Inject PageRepo pageRepo;
+    private final PageRepo pageRepo;
+    private final PgPool client;
+
+    @Inject
+    public Boot(PageRepo pageRepo, PgPool client) {
+        this.pageRepo = pageRepo;
+        this.client = client;
+    }
 
     void onStart(@Observes StartupEvent event) {
         LOG.info(">>> pages count is:");
@@ -26,23 +38,13 @@ public class Boot {
 
         // === CREATE pages
         LOG.info(">> creating pages...");
+        createPage(31);
 
-        Multi.createFrom().items(3, 4, 5)
-                .onItem().transform(n -> {
-                    Page page = new Page();
-                    page.title = String.format("Page %d", n);
-                    page.body = "lorem...";
-                    page.spaceKey = "DEV";
-                    page.parentId = (long) n;
-                    page.authorId = (long) n;
-                    page.createdAt = LocalDateTime.now();
-                    page.lastUpdated = LocalDateTime.now();
-                    page.persist();
-                    return page;
-                })
-                .select().first(3)
-                .onFailure().recoverWithItem(new Page())
-                .subscribe().with(System.out::println);
+        // === GET pages
+//        getPagesBoot();
+
+
+        // === create Pages manually
 
 //        Multi.createFrom().items(3, 4, 5)
 //                .onItem().transform(n -> {
@@ -54,14 +56,28 @@ public class Boot {
 //                    page.authorId = (long) n;
 //                    page.createdAt = LocalDateTime.now();
 //                    page.lastUpdated = LocalDateTime.now();
+//                    page.persist();
 //                    return page;
 //                })
 //                .select().first(3)
 //                .onFailure().recoverWithItem(new Page())
 //                .subscribe().with(System.out::println);
 
+
 //        Page.list("select distinct from pages where id < ?", 150L).subscribe().with(i -> System.out.println(i));
-        Page.findAll().list().subscribe().with(System.out::println, Throwable::printStackTrace);
+//        Page.findAll().list().subscribe().with(System.out::println, Throwable::printStackTrace);
+    }
+
+    private void getPagesBoot() {
+        this.client
+                .query("SELECT * FROM pages")
+                .execute()
+                .onItem().transformToMulti(
+                        rs -> Multi.createFrom().items(() -> StreamSupport.stream(rs.spliterator(), false))
+                ).map(this::rowToPage).subscribe().with(
+                        item -> System.out.println(item),
+                        failure -> System.out.println("Failed with " + failure),
+                        () -> System.out.println("Completed"));
     }
 
     @ReactiveTransactional
@@ -74,12 +90,15 @@ public class Boot {
         page.authorId = (long) n;
         page.createdAt = LocalDateTime.now();
         page.lastUpdated = LocalDateTime.now();
-        pageRepo.persist(page).await().indefinitely();
+        client.preparedQuery("insert into pages(id, title, body, space_key, parent_id, author_id, created_at, last_updated) " +
+                        "values ($1, $2, $3, $4, $5, $6, $7, $8)")
+                .execute(Tuple.tuple(List.of(n, page.title, page.body, page.spaceKey, page.parentId, page.authorId, page.createdAt, page.lastUpdated)))
+                .map(RowSet::iterator).subscribe().with(System.out::println);
+//        pageRepo.persist(page).subscribe().with(System.out::println);
     }
 
     @ReactiveTransactional
     private void createPages() {
-
         Multi.createFrom().generator(() -> 1, (n, emitter) -> {
             int next = n + 1;
             if (n <= 10) {
@@ -108,4 +127,17 @@ public class Boot {
 //            }
 //        }).subscribe();
     }
+
+    private Page rowToPage(Row row) {
+        return Page.of(row.getLong("id"),
+                row.getString("title"),
+                row.getString("body"),
+                row.getString("space_key"),
+                row.getLong("author_id"),
+                row.getLong("parent_id"),
+                row.getLocalDateTime("created_at"),
+                row.getLocalDateTime("last_updated"));
+    }
+
 }
+

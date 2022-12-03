@@ -6,6 +6,7 @@ import io.smallrye.mutiny.Uni;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "pages")
@@ -27,5 +28,12 @@ public class Page extends PanacheEntity {
     public Long parentId;
     public static Uni<List<Page>> findBySpaceKey(String spaceKey) {
         return find("#Page.getBySpace", spaceKey).list();
+    }
+
+    public static Page of(long id, String title, String body, String spaceKey, long authorId,
+                          long parentId, LocalDateTime createdAt, LocalDateTime lastUpdated) {
+        Page page = new Page();
+        page.id = id;
+        return page;
     }
 }

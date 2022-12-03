@@ -3,22 +3,26 @@ package com.andmal;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@RequestScoped
 @Path("/rest/api/pages")
 public class PageResource {
+    private final static Logger LOGGER = LoggerFactory.getLogger(PageResource.class);
     @Inject
     PageRepo pageRepo;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Uni<List<PanacheEntityBase>> pages() {
-
         return Page.listAll();
     }
 
