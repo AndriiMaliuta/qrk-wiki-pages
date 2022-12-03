@@ -1,5 +1,6 @@
 package com.andmal;
 
+import javax.json.bind.annotation.JsonbDateFormat;
 import javax.json.bind.annotation.JsonbProperty;
 import java.time.LocalDateTime;
 
@@ -11,6 +12,7 @@ public class CreatePage {
     @JsonbProperty(value = "author_id")
     public Long authorId;
     @JsonbProperty(value = "created_at")
+//    @JsonbDateFormat("")
     public LocalDateTime createdAt;
     @JsonbProperty(value = "last_updated")
     public LocalDateTime lastUpdated;

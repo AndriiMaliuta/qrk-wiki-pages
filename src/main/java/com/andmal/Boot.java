@@ -25,17 +25,48 @@ public class Boot {
 //        System.out.println(Page.findById(147L).await().indefinitely());
 
         // === CREATE pages
-//        LOG.info(">> creating pages...");
-//        createPage(5);
+        LOG.info(">> creating pages...");
+
+        Multi.createFrom().items(3, 4, 5)
+                .onItem().transform(n -> {
+                    Page page = new Page();
+                    page.title = String.format("Page %d", n);
+                    page.body = "lorem...";
+                    page.spaceKey = "DEV";
+                    page.parentId = (long) n;
+                    page.authorId = (long) n;
+                    page.createdAt = LocalDateTime.now();
+                    page.lastUpdated = LocalDateTime.now();
+                    page.persist();
+                    return page;
+                })
+                .select().first(3)
+                .onFailure().recoverWithItem(new Page())
+                .subscribe().with(System.out::println);
+
+//        Multi.createFrom().items(3, 4, 5)
+//                .onItem().transform(n -> {
+//                    Page page = new Page();
+//                    page.title = String.format("Page %d", n);
+//                    page.body = "lorem...";
+//                    page.spaceKey = "DEV";
+//                    page.parentId = (long) n;
+//                    page.authorId = (long) n;
+//                    page.createdAt = LocalDateTime.now();
+//                    page.lastUpdated = LocalDateTime.now();
+//                    return page;
+//                })
+//                .select().first(3)
+//                .onFailure().recoverWithItem(new Page())
+//                .subscribe().with(System.out::println);
 
 //        Page.list("select distinct from pages where id < ?", 150L).subscribe().with(i -> System.out.println(i));
-//        Page.findAll().list().subscribe().with(System.out::println, Throwable::printStackTrace);
+        Page.findAll().list().subscribe().with(System.out::println, Throwable::printStackTrace);
     }
 
     @ReactiveTransactional
     private void createPage(int n) {
         Page page = new Page();
-        page.id = (long) n;
         page.title = String.format("Page %d", n);
         page.body = "lorem...";
         page.spaceKey = "DEV";
@@ -43,7 +74,7 @@ public class Boot {
         page.authorId = (long) n;
         page.createdAt = LocalDateTime.now();
         page.lastUpdated = LocalDateTime.now();
-        pageRepo.persist(page).subscribe().with(System.out::println);
+        pageRepo.persist(page).await().indefinitely();
     }
 
     @ReactiveTransactional
@@ -53,7 +84,7 @@ public class Boot {
             int next = n + 1;
             if (n <= 10) {
                 Page page = new Page();
-                page.id = (long) n;
+//                page.id = (long) n;
                 page.title = String.format("Page %d", n);
                 page.body = "lorem...";
                 page.spaceKey = "DEV";
@@ -62,8 +93,8 @@ public class Boot {
                 page.createdAt = LocalDateTime.now();
                 page.lastUpdated = LocalDateTime.now();
                 Uni<Page> savedPage = pageRepo.persist(page);
-                Page.persist(page).subscribe().with(System.out::println);
-                LOG.info(savedPage.toString());
+//                Page.persist(page).subscribe().with(System.out::println);
+//                LOG.info(savedPage.toString());
                 emitter.emit(next);
             } else {
                 emitter.complete();

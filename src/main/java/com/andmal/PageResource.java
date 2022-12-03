@@ -1,6 +1,7 @@
 package com.andmal;
 
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
+import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
 import javax.inject.Inject;
@@ -17,6 +18,7 @@ public class PageResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Uni<List<PanacheEntityBase>> pages() {
+
         return Page.listAll();
     }
 
