@@ -3,11 +3,8 @@ package com.andmal;
 import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional;
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Multi;
-import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.pgclient.PgPool;
-import io.vertx.mutiny.sqlclient.Row;
-import io.vertx.mutiny.sqlclient.RowSet;
-import io.vertx.mutiny.sqlclient.Tuple;
+import io.vertx.mutiny.sqlclient.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,12 +19,12 @@ import java.util.stream.StreamSupport;
 public class Boot {
     private static final Logger LOG = LoggerFactory.getLogger(Boot.class);
     private final PageRepo pageRepo;
-    private final PgPool client;
+    private final PgPool pgClient;
 
     @Inject
     public Boot(PageRepo pageRepo, PgPool client) {
         this.pageRepo = pageRepo;
-        this.client = client;
+        this.pgClient = client;
     }
 
     void onStart(@Observes StartupEvent event) {
@@ -38,10 +35,13 @@ public class Boot {
 
         // === CREATE pages
         LOG.info(">> creating pages...");
-        createPage(31);
+
+//        createPage(31);
+
+//        createPagesClient(8000, 9000);
 
         // === GET pages
-//        getPagesBoot();
+        getPagesBoot();
 
 
         // === create Pages manually
@@ -69,12 +69,13 @@ public class Boot {
     }
 
     private void getPagesBoot() {
-        this.client
+        this.pgClient
                 .query("SELECT * FROM pages")
                 .execute()
                 .onItem().transformToMulti(
                         rs -> Multi.createFrom().items(() -> StreamSupport.stream(rs.spliterator(), false))
-                ).map(this::rowToPage).subscribe().with(
+                ).log("... getting page ...")
+                .map(this::rowToPage).subscribe().with(
                         item -> System.out.println(item),
                         failure -> System.out.println("Failed with " + failure),
                         () -> System.out.println("Completed"));
@@ -90,42 +91,47 @@ public class Boot {
         page.authorId = (long) n;
         page.createdAt = LocalDateTime.now();
         page.lastUpdated = LocalDateTime.now();
-        client.preparedQuery("insert into pages(id, title, body, space_key, parent_id, author_id, created_at, last_updated) " +
+        pgClient.preparedQuery("insert into pages(id, title, body, space_key, parent_id, author_id, created_at, last_updated) " +
                         "values ($1, $2, $3, $4, $5, $6, $7, $8)")
                 .execute(Tuple.tuple(List.of(n, page.title, page.body, page.spaceKey, page.parentId, page.authorId, page.createdAt, page.lastUpdated)))
-                .map(RowSet::iterator).subscribe().with(System.out::println);
+                .map(RowSet::iterator)
+                .subscribe().with(System.out::println);
 //        pageRepo.persist(page).subscribe().with(System.out::println);
     }
 
     @ReactiveTransactional
-    private void createPages() {
-        Multi.createFrom().generator(() -> 1, (n, emitter) -> {
+    private void createPagesClient(int from, int to) {
+        Multi.createFrom().generator(() -> from, (n, emitter) -> {
+//            if (pageRepo.findAll().stream().filter(p -> p.id == (long) n).collect().)
+            String SPACE_KEY = "DEV";
             int next = n + 1;
-            if (n <= 10) {
+            if (n <= to) {
                 Page page = new Page();
 //                page.id = (long) n;
                 page.title = String.format("Page %d", n);
-                page.body = "lorem...";
-                page.spaceKey = "DEV";
+                page.body = "lorem.ipsum dolor sit .....";
+                page.spaceKey = SPACE_KEY;
                 page.parentId = (long) n;
                 page.authorId = (long) n;
                 page.createdAt = LocalDateTime.now();
                 page.lastUpdated = LocalDateTime.now();
-                Uni<Page> savedPage = pageRepo.persist(page);
+//                Uni<Page> savedPage = pageRepo.persist(page);
 //                Page.persist(page).subscribe().with(System.out::println);
 //                LOG.info(savedPage.toString());
+                pgClient.preparedQuery("insert into pages(id, title, body, space_key, parent_id, author_id, created_at, last_updated) " +
+                                "values ($1, $2, $3, $4, $5, $6, $7, $8)")
+                        .execute(Tuple.tuple(List.of(n, page.title, page.body, page.spaceKey, page.parentId, page.authorId, page.createdAt, page.lastUpdated)))
+                        .map(RowSet::iterator)
+                        .subscribe().with(System.out::println);
                 emitter.emit(next);
             } else {
                 emitter.complete();
+                LOG.info("[ \uD83D\uDC4C ]");
             }
             return next;
         }).subscribe().with(System.out::println);
 
-//        Multi.createFrom().items((e) -> {
-//            for (int i = 2; i < 10; i++) {
-//
-//            }
-//        }).subscribe();
+
     }
 
     private Page rowToPage(Row row) {
