@@ -1,8 +1,8 @@
 package com.andmal;
 
+import com.andmal.model.Page;
 import io.quarkus.grpc.GrpcService;
 
-import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import org.slf4j.Logger;

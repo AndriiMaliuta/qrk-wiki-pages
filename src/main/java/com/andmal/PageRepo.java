@@ -1,5 +1,6 @@
 package com.andmal;
 
+import com.andmal.model.Page;
 import io.quarkus.hibernate.reactive.panache.PanacheRepository;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;

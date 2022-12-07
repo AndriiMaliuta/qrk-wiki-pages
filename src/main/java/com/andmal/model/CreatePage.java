@@ -1,4 +1,4 @@
-package com.andmal;
+package com.andmal.model;
 
 import javax.json.bind.annotation.JsonbDateFormat;
 import javax.json.bind.annotation.JsonbProperty;

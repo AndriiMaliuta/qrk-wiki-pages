@@ -1,4 +1,4 @@
-package com.andmal;
+package com.andmal.model;
 
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 import io.smallrye.mutiny.Uni;
@@ -6,7 +6,6 @@ import io.smallrye.mutiny.Uni;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "pages")

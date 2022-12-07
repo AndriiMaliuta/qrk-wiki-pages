@@ -1,7 +1,9 @@
-package com.andmal;
+package com.andmal.rest;
 
+import com.andmal.PageRepo;
+import com.andmal.model.CreatePage;
+import com.andmal.model.Page;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
-import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

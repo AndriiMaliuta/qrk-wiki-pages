@@ -1,5 +1,6 @@
 package com.andmal;
 
+import com.andmal.model.Page;
 import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional;
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Multi;
@@ -39,8 +40,7 @@ public class Boot {
 //        createPagesClient(8000, 9000);
 
         // === GET pages
-        getPagesBoot();
-
+//        getPagesBoot();
 
         // === create Pages manually
 

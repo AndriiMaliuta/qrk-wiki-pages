@@ -36,7 +36,10 @@
 <script type="text/javascript">
     const pageDataTr = document.querySelector("table>tbody>tr");
     const pageData = pageDataTr.children.item(1);
-    pageData.textContent = "1000";
+    fetch("/rest/api/stats/pages").then(resp => resp.json()).then(res => {
+        pageData.textContent = res;
+    });
+
 </script>
 </body>
 </html>
