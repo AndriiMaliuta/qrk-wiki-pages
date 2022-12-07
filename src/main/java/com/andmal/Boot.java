@@ -34,10 +34,8 @@ public class Boot {
 //        System.out.println(Page.findById(147L).await().indefinitely());
 
         // === CREATE pages
-        LOG.info(">> creating pages...");
-
+//        LOG.info(">> creating pages...");
 //        createPage(31);
-
 //        createPagesClient(8000, 9000);
 
         // === GET pages

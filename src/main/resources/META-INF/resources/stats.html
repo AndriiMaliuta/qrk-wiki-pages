@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Stats</title>
+    <style>
+        table, tr, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 3px;
+        }
+    </style>
+</head>
+<body>
+<div class="root">
+    <table>
+        <thead>
+        <tr>
+            <th>Space</th>
+            <th>Page</th>
+            <th>Blog</th>
+            <th>Comment</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>X</td>
+            <td></td>
+            <td>X</td>
+            <td>X</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+    const pageDataTr = document.querySelector("table>tbody>tr");
+    const pageData = pageDataTr.children.item(1);
+    pageData.textContent = "1000";
+</script>
+</body>
+</html>
