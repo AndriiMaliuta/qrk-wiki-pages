@@ -7,7 +7,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.List;
 
 @Path("/misc/")
 public class MiscControllers {
